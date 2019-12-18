@@ -642,8 +642,12 @@ let on_notification rpc store (notification : Lsp.Client_notification.t) =
       List.fold_left ~f ~init:prev_doc contentChanges
     in
     Document_store.put store doc;
-    send_diagnostics rpc doc;
+    (*send_diagnostics rpc doc;*)
     Ok store
+  | TextDocumentDidSave uri ->
+      Document_store.get store uri >>= fun doc ->
+        send_diagnostics rpc doc;
+        Ok store
   | ChangeConfiguration _
   | ChangeWorkspaceFolders _
   | Initialized

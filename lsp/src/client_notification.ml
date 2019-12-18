@@ -19,6 +19,14 @@ let of_jsonrpc (r : Jsonrpc.Request.t) =
   | "textDocument/didChange" ->
     Jsonrpc.Request.params r DidChangeTextDocumentParams.t_of_yojson
     >>| fun params -> TextDocumentDidChange params
+  | "textDocument/didSave" ->
+      begin
+        match packet.params with
+        | Some (`Assoc ["textDocument", `Assoc["uri", uri]]) ->
+            Ok(Client_notification (TextDocumentDidSave (Uri.t_of_yojson uri)))
+        | _ -> Error "uh"
+
+      end
   | "exit" -> Ok Exit
   | "initialized" -> Ok Initialized
   | "workspace/didChangeWorkspaceFolders" ->
